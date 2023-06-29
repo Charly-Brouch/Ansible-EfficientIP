@@ -9,7 +9,7 @@
 
 DOCUMENTATION = '''
 ---
-module: EfficientIP 
+module: EfficientIP
 version_added: "0.8"
 short_description: Ansible interface to the REST/RPC EfficientIP SOLIDServer API
 description:
@@ -86,17 +86,17 @@ class Eip(object):
                 ipm_changed=True
 
         elif req_status_code == 200:
-	    if ipm_cmd == 'rest/ip_delete' or ipm_cmd == 'rest/dns_rr_delete' : 
+            if ipm_cmd == 'rest/ip_delete' or ipm_cmd == 'rest/dns_rr_delete' :
                 ipm_check=True
                 ipm_changed=True
             else:
                 ipm_check=True
                 ipm_changed=False
-        
+
         else:
             ipm_check=False
             ipm_changed=False
-        
+
         return (req_output,ipm_check,ipm_changed)
 
 
@@ -136,7 +136,7 @@ class Eip(object):
     def ip_address_find_free(self,ipm_subnet_id):
        method = 'get'
        ipm_cmd = 'rpc/ip_find_free_address'
-       querystring =  {'subnet_id' : ipm_subnet_id, 'max_find' : '1'} 
+       querystring =  {'subnet_id' : ipm_subnet_id, 'max_find' : '1'}
        return self.req(method,ipm_cmd,querystring)
 
     def dns_cname_add(self,ipm_alias_fqdn,ipm_alias_value,ipm_alias_ttl):
@@ -173,7 +173,7 @@ def main():
             ipm_hostname     = dict(required=False),
             ipm_hostaddr     = dict(required=False),
             ipm_macaddr      = dict(required=False),
-    	    ipm_alias_fqdn   = dict(required=False),
+            ipm_alias_fqdn   = dict(required=False),
             ipm_alias_value  = dict(required=False),
             ipm_alias_ttl    = dict(required=False),
             ipm_classparam   = dict(required=False),
@@ -184,9 +184,9 @@ def main():
                                                             'ip_address_delete',
                                                             'ip_address_find_free',
                                                             'dns_cname_delete',
-							    'dns_cname_add'])
+                                'dns_cname_add'])
         ), supports_check_mode=False
-    )   
+    )
 
     insecure        = module.params["insecure"]
     ipm_server      = module.params["ipm_server"]
@@ -198,13 +198,13 @@ def main():
     ipm_subnet_id   = module.params["ipm_subnet_id"]
     ipm_hostname    = module.params["ipm_hostname"]
     ipm_hostaddr    = module.params["ipm_hostaddr"]
-    ipm_macaddr     = module.params["ipm_macaddr"]   
+    ipm_macaddr     = module.params["ipm_macaddr"]
     ipm_alias_fqdn  = module.params["ipm_alias_fqdn"]
     ipm_alias_value = module.params["ipm_alias_value"]
     ipm_alias_ttl   = module.params["ipm_alias_ttl"]
     ipm_classparam  = module.params["ipm_classparam"]
-    ipm_classname   = module.params["ipm_classname"]   
-    ipm_action = module.params["ipm_action"]   
+    ipm_classname   = module.params["ipm_classname"]
+    ipm_action = module.params["ipm_action"]
 
     try:
         eip = Eip(module, ipm_server, ipm_username, ipm_password)
@@ -215,7 +215,7 @@ def main():
                 data = []
                 for rows in result[0]:
                     data.append({ 'ipm_space_id': rows['site_id'], 'ipm_space' :  rows['site_name'] })
-                req_output = { 'output' : data } 
+                req_output = { 'output' : data }
                 module.exit_json(changed=result[2], result=req_output)
             else:
                 raise Exception()
@@ -228,7 +228,7 @@ def main():
                      raw_network = int(rows['start_ip_addr'],16)
                      network = '.'.join( [ str((raw_network >> 8*i) % 256)  for i in [3,2,1,0] ])
                      data.append({ 'ipm_subnet_size' : rows['subnet_size'], 'ipm_subnet_addr' : network, 'ipm_subnet_id' : rows['subnet_id'], 'ipm_subnet' :  rows['subnet_name'] })
-                req_output = { 'output' : data } 
+                req_output = { 'output' : data }
                 module.exit_json(changed=result[2], result=req_output)
             else:
                 raise Exception()
@@ -238,18 +238,18 @@ def main():
             if result[1] == True:
                 req_output = {"output" : "entry added" }
                 module.exit_json(changed=result[2], result=req_output)
-            elif result[1] == False: 
+            elif result[1] == False:
                 req_output = {"output" : result[0] }
                 module.exit_json(changed=result[2], result=req_output, failed=True)
             else:
                 raise Exception()
-    
+
         if ipm_action == 'ip_address_delete':
             result = eip.ip_address_delete(ipm_space,ipm_hostaddr)
             if result[1] == True:
                 req_output = {"output" : "entry deleted" }
                 module.exit_json(changed=result[2], result=req_output)
-            elif result[1] == False: 
+            elif result[1] == False:
                 req_output = {"output" : result[0] }
                 module.exit_json(changed=result[2], result=req_output, failed=True)
             else:
@@ -268,18 +268,18 @@ def main():
             if result[1] == True:
                 req_output = {"output" : "entry added" }
                 module.exit_json(changed=result[2], result=req_output)
-            elif result[1] == False: 
+            elif result[1] == False:
                 req_output = {"output" : result[0] }
                 module.exit_json(changed=result[2], result=req_output, failed=True)
             else:
                 raise Exception()
-    
+
         if ipm_action == 'dns_cname_delete':
             result = eip.dns_cname_delete(ipm_alias_fqdn,ipm_alias_value)
             if result[1] == True:
                 req_output = {"output" : "entry deleted" }
                 module.exit_json(changed=result[2], result=req_output)
-            elif result[1] == False: 
+            elif result[1] == False:
                 req_output = {"output" : result[0] }
                 module.exit_json(changed=result[2], result=req_output, failed=True)
             else:
@@ -295,4 +295,3 @@ from ansible.module_utils.basic import AnsibleModule
 
 if __name__ == '__main__':
         main()
-
