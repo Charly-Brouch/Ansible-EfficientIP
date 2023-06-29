@@ -45,7 +45,7 @@ class Eip(object):
         requests.packages.urllib3.disable_warnings()
 
         try:
-            session = requests.request(method, self.base_url + ipm_cmd, params=querystring, headers=self.ipm_auth_hdr, verify=False, timeout=10)
+            session = requests.request(method, self.base_url + ipm_cmd, params=querystring, headers=self.ipm_auth_hdr, verify=False, timeout=60)
         except:
             try:
                 if session:
